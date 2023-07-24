@@ -4,11 +4,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.ComponentModel.Com2Interop;
 using static System.Collections.Specialized.BitVector32;
 
 namespace WinFormsApp2
@@ -1135,17 +1138,55 @@ namespace WinFormsApp2
         }
         #endregion Medium
         #region Hard
-        // I. If Computer moves first.
-        // 1st move. It moves randomly to a corner or the center.
-        // 2nd move. a) If the 1st move was to a corner, and Player moved to the opposite corner, Computer moves to one of the empty corners
-        //              and at the 3d move to the last free corner.
-        //           b) Else if the 1st move was to a corner, and Player moved to an adjacent corner, Computer moves to the edge middle field 
-        //              next to Computer sign from the 1st move and not on the same line with Player's sign.
-        //              The 3d move of the Computer is to the center.
-        //           c) Else if the 1st move was to a corner, and Player moved to the center, Computer moves to the opposite corner.
-        //              The 3d move: if Player moves to a corner, Computer moves to the last free corner;
-        //              If Player moves to an edge middle, Computer moves to the corner at the far side from Player's sign.
-        //           d) If the 1st move was to the center
+        // Move 1.
+        //    If the Computer moves first and makes the first move, it marks randomly any field in the playground.
+        //    If the Computer moves 2nd and there is only one Player's sign on the playground:
+        //    a) if the Player marked the center, the Computer answers by marking any of the corners;
+        //    b) if the Player marked a corner, the Computer answers by marking the center;
+        //    c) if the Player marked a middle of a side of the playground, the Computer answers randomly according to any of the following options:
+        //          c.1 marking the center;
+        //          c.2 marking any of the two adjacent corners;
+        //          c.3 marking the middle of the opposite side of the playground so that its sign is on the same 3-membered straight line with the Player's sign.
+        // Move 2.
+        //     If Computer moves first: it tries to make a fork.
+        //           a) If the Computer marked a corner, and the Player marked the opposite corner, the Computer markes one of the empty corners
+        //              and at the 3d move the last free corner to make a fork. If the Player marks the last free corner instead of marking the field between the
+        //              signs of the Computer, the Computer wins via marking that middle field.
+        //           b) Else if the 1st Computer's move was to a corner, and the Player marked an adjacent corner, Computer answers by marking
+        //              the edge middle field next to Computer's sign from the 1st move and NOT on the same playground edge with Player's sign
+        //              The Player has no choice except marking the corner at the same edge with the signs of the Computer in order not to loose.
+        //              The 3d move of the Computer should be to the center, if empty, to make a fork.
+        //           c) Else if the first mark of the Computer was at a corner, and the Player marked the center, Computer markes the opposite corner.
+        //              The 3d move: if the Player marks a corner, the Computer moves to the last free corner and makes a fork;
+        //              If the Player moves to an edge middle, the Computer answers to the 3d empty field on the line marked by the Player and makes a draw.
+        //           d) Else if the Computer marked the center in the 1st move, its 2nd mark should
+        //                  d1) block a line containing the sign of the Player and 2 empty fields AND
+        //                  d2) the 1st mark of the Player should be NOT on the line formed by the Computer's signs.
+        //     If the Player moves first, the Computer prevents the Player from making forks via placing its 2nd sign onto a 3-member straight line
+        //     containing its sign and two other empty fields. Before doing the move, the Computer identifies a bunch of all 3-membered straight lines
+        //     containig its sign and selects only those which have other two fields empty; it selects a line from the remaining lines selected and a field in it so
+        //     that the Player cannot make a fork by occupying the 3d field on the line, otherwise it checks the other empty field and other available lines.
+        //           
+        //    General rule of the highest priority: if there are two signs of the Computer on one 3-membered straight line, and the third field on the line is empty,
+        // the Computer should go on to that empty field to immediately win.
+        //    General rule of the 2nd high priority: if there are two signs of the Player on one 3-membered straight line an the third field on the line is emtpy,
+        // the Computer should go to any such a field to prevent the Player from winning in the next move.
+        //    General rule of the 3d high priority: if there are at least two signs (maximum 3 possible) of the Computer located not on one common 3-membered straight line,
+        // or there are two signs of the Computer on one common 3-membered straight line and a sign of the Player on the same 3-membered straight line,
+        // the Computer identifies own possible future forks:
+        //                         3.a) it identifes a bunch of all 3-membered straight lines passing through each of its signs;
+        //                         3.b) the Computer discards all identified 3-membered lines containing Player's sign;
+        //                         3.c) the Computer identifies all crosses between the remaining 3-membered straight lines belonging to different bunches
+        //                              and moves to any of the identified crosses.
+        //    General rule of the 4th high priority: if there are at least two signs of the Player (of totally maximum three signs of the Player) located
+        // not on one 3-membered straight line or there are two signs of the Player on one common 3-membered straight line and a sign of the Computer on the same
+        // 3-membered straight line, the Computer should identify the empty crosses of the 3-membered straight lines containing the signs of the Player. If there is only
+        // one such empty cross, the Computer should mark it. Else if there are more than 1 such empty crosses, the Computer should mark a field on a 3-membered straight line
+        // occupied by the Computer exclusively so that the remaining empty field on the line IS NOT a one of the identifed empty crosses. If this is not possible,
+        // the Computer marks any of the identified empty crosses (with a possibility to lose, if the Player plays well).
+        //    General rule of the 5th high priority: if the Computer is going to put its 2nd sign on a line containing already its sign while the other two fields are empty,
+        // it may only do it so, if the remaining empty field on the line does not lie on crossing lines exclusively occupied by the Player (to avoid inducing Player's fork).
+        //    General rule: the Computer should occupy lines already occupied by the Player so that they are not exclusively occupied by the Player.
         private void computers_move_hard(out int _row, out int _col)
         {
             _row = -1;
