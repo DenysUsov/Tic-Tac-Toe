@@ -1191,7 +1191,139 @@ namespace WinFormsApp2
         {
             _row = -1;
             _col = -1;
+            Random rnd = new Random();
+            int random = -1;
 
+            // 1st move. 
+            if (count_empty_fields() == 9)
+            {
+                // I. If the Computer moves first and makes the first move, it marks randomly any field in the playground.
+                if (m.Goes_First == Model_Helper.Players.Computer)
+                {
+                    computers_move_simple(out _row, out _col);
+                }
+            }
+            //    If the Computer moves 2nd and there is only one Player's sign on the playground:
+            //    a) if the Player marked the center, the Computer answers by marking any of the corners;
+            //    b) if the Player marked a corner, the Computer answers by marking the center;
+            //    c) if the Player marked a middle of a side of the playground, the Computer answers randomly according to any of the following options:
+            //          c.1 marking the center;
+            //          c.2 marking any of the two adjacent corners;
+            //          c.3 marking the middle of the opposite side of the playground so that its sign is on the same 3-membered straight line with the Player's sign.
+            else if (count_empty_fields() == 8 && m.Goes_First == Model_Helper.Players.Player)
+            {
+                if (m[0, 0] == 2 && m[0, 1] == 2 && m[0, 2] == 2 &&
+                    m[1, 0] == 2 && m[1, 1] == 0 && m[1, 2] == 2 &&
+                    m[2, 0] == 2 && m[2, 1] == 2 && m[2, 2] == 2) // Case a); Player = 0, occupied by Computer = 1, empty = 2
+                {
+                    random = rnd.Next(4);
+                    if (random == 0)
+                    {
+                        _row = 0; // top left corner
+                        _col = 0;
+                    }
+                    else if (random == 1)
+                    {
+                        _row = 0; // top right corner
+                        _col = 2;
+                    }
+                    else if (random == 2)
+                    {
+                        _row = 2; // bottom left corner
+                        _col = 0;
+                    }
+                    else if (random == 3)
+                    {
+                        _row = 2; // bottom right corner
+                        _col = 2;
+                    }
+                }
+                else if ((m[0, 0] == 0 || m[0, 2] == 0 || m[2, 0] == 0 || m[2, 2] == 0) &&
+                    (m[0, 1] == 2 && m[1, 0] == 2 && m[1, 1] == 2 && m[1, 2] == 2 && m[2, 1] == 2)) // Case b); Player = 0, occupied by Computer = 1, empty = 2
+                {
+                    _row = 1;
+                    _col = 1;
+                }
+                else if ((m[0, 1] == 0 || m[1, 0] == 0 || m[1, 2] == 0 || m[2, 1] == 0) &&
+                   (m[0, 0] == 2 && m[0, 2] == 2 && m[1, 1] == 2 && m[2, 0] == 2 && m[2, 2] == 2)) // Case c); Player = 0, occupied by Computer = 1, empty = 2
+                {
+                    random = rnd.Next(4); // random == 0 => c.1; random == 1 || 2 => c.2; random == 3 => c.3
+                    if (random == 0)
+                    {
+                        _row = 1;
+                        _col = 1;
+                    }
+                    else if (random == 1) // anti-clockwise
+                    {
+                        if (m[0, 1] == 0)
+                        {
+                            _row = 0;
+                            _col = 0;
+                        }
+                        else if (m[1, 0] == 0)
+                        {
+                            _row = 2;
+                            _col = 0;
+                        }
+                        else if (m[2, 1] == 0)
+                        {
+                            _row = 2;
+                            _col = 2;
+                        }
+                        else if (m[1, 2] == 0)
+                        {
+                            _row = 0;
+                            _col = 2;
+                        }
+                    }
+                    else if (random == 2) // clockwise
+                    {
+                        if (m[0, 1] == 0)
+                        {
+                            _row = 0;
+                            _col = 2;
+                        }
+                        else if (m[1, 0] == 0)
+                        {
+                            _row = 0;
+                            _col = 0;
+                        }
+                        else if (m[2, 1] == 0)
+                        {
+                            _row = 2;
+                            _col = 0;
+                        }
+                        else if (m[1, 2] == 0)
+                        {
+                            _row = 2;
+                            _col = 2;
+                        }
+                    }
+                    else if (random == 3)
+                    {
+                        if (m[0, 1] == 0) // top middle => bottom middle
+                        {
+                            _row = 2;
+                            _col = 1;
+                        }
+                        else if (m[2, 1] == 0) // bottom middle => top middle
+                        {
+                            _row = 0;
+                            _col = 1;
+                        }
+                        else if (m[1, 0] == 0) // left middle => right middle
+                        {
+                            _row = 1;
+                            _col = 2;
+                        }
+                        else if (m[1, 2] == 0) //  right middle => left middle
+                        {
+                            _row = 1;
+                            _col = 0;
+                        }
+                    }
+                }
+            }
         }
         #endregion Hard
     }
