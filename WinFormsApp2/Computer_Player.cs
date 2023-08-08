@@ -1264,6 +1264,8 @@ namespace WinFormsApp2
             _col = -1;
             Random rnd = new Random();
             int random = -1;
+            bool temp_bool = false;
+            Point temp_point, temp_point2;
 
             // 1st move. 
             if (count_empty_fields() == 9)
@@ -1272,6 +1274,7 @@ namespace WinFormsApp2
                 if (m.Goes_First == Model_Helper.Players.Computer)
                 {
                     computers_move_simple(out _row, out _col);
+                    return;
                 }
             }
             //    If the Computer moves 2nd and there is only one Player's sign on the playground:
@@ -1319,81 +1322,93 @@ namespace WinFormsApp2
                    (m[0, 0] == 2 && m[0, 2] == 2 && m[1, 1] == 2 && m[2, 0] == 2 && m[2, 2] == 2)) // Case c); Player = 0, occupied by Computer = 1, empty = 2
                 {
                     random = rnd.Next(4); // random == 0 => c.1; random == 1 || 2 => c.2; random == 3 => c.3
-                    if (random == 0)
+                    if (random == 0) // the center
                     {
                         _row = 1;
                         _col = 1;
+                        return;
                     }
-                    else if (random == 1) // anti-clockwise
+                    else if (random == 1) // anti-clockwise, adjacent corner
                     {
-                        if (m[0, 1] == 0)
-                        {
-                            _row = 0;
-                            _col = 0;
-                        }
-                        else if (m[1, 0] == 0)
-                        {
-                            _row = 2;
-                            _col = 0;
-                        }
-                        else if (m[2, 1] == 0)
-                        {
-                            _row = 2;
-                            _col = 2;
-                        }
-                        else if (m[1, 2] == 0)
-                        {
-                            _row = 0;
-                            _col = 2;
-                        }
+                        find_first_field_occupied_by(0, 0, 0, out _row, out _col);
+                        temp_point = new Point(_row, _col); // the field marked by Player
+                        temp_point = find_outer_field(temp_point, false, 1);
+                        _row = temp_point.Row;
+                        _col = temp_point.Col;
+                        return;
                     }
-                    else if (random == 2) // clockwise
+                    else if (random == 2) // clockwise, adjacent corner
                     {
-                        if (m[0, 1] == 0)
-                        {
-                            _row = 0;
-                            _col = 2;
-                        }
-                        else if (m[1, 0] == 0)
-                        {
-                            _row = 0;
-                            _col = 0;
-                        }
-                        else if (m[2, 1] == 0)
-                        {
-                            _row = 2;
-                            _col = 0;
-                        }
-                        else if (m[1, 2] == 0)
-                        {
-                            _row = 2;
-                            _col = 2;
-                        }
+                        find_first_field_occupied_by(0, 0, 0, out _row, out _col);
+                        temp_point = new Point(_row, _col); // the field marked by Player
+                        temp_point = find_outer_field(temp_point, true, 1);
+                        _row = temp_point.Row;
+                        _col = temp_point.Col;
+                        return;
                     }
-                    else if (random == 3)
+                    else if (random == 3) // the opposite edger middle
                     {
-                        if (m[0, 1] == 0) // top middle => bottom middle
-                        {
-                            _row = 2;
-                            _col = 1;
-                        }
-                        else if (m[2, 1] == 0) // bottom middle => top middle
-                        {
-                            _row = 0;
-                            _col = 1;
-                        }
-                        else if (m[1, 0] == 0) // left middle => right middle
-                        {
-                            _row = 1;
-                            _col = 2;
-                        }
-                        else if (m[1, 2] == 0) //  right middle => left middle
-                        {
-                            _row = 1;
-                            _col = 0;
-                        }
+                        find_first_field_occupied_by(0, 0, 0, out _row, out _col);
+                        temp_point = new Point(_row, _col); // the field marked by Player
+                        temp_point = find_outer_field(temp_point, true, 4);
+                        _row = temp_point.Row;
+                        _col = temp_point.Col;
+                        return;
                     }
                 }
+            }
+            // Move 2.
+            //     If Computer moves first: it tries to make a fork.
+            //           a) If the Computer marked a corner, and the Player marked the opposite corner, the Computer markes one of the empty corners
+            //              and at the 3d move the last free corner to make a fork. If the Player marks the last free corner instead of marking the field between the
+            //              signs of the Computer, the Computer wins via marking that middle field.
+            //           b) Else if the 1st Computer's move was to a corner, and the Player marked an adjacent corner, Computer answers by marking
+            //              the edge middle field next to Computer's sign from the 1st move and NOT on the same playground edge with Player's sign
+            //              The Player has no choice except marking the corner at the same edge with the signs of the Computer in order not to loose.
+            //              The 3d move of the Computer should be to the center, if empty, to make a fork.
+            //           c) Else if the first mark of the Computer was at a corner, and the Player marked the center, Computer markes the opposite corner.
+            //              The 3d move: if the Player marks a corner, the Computer moves to the last free corner and makes a fork;
+            //              If the Player moves to an edge middle, the Computer answers to the 3d empty field on the line marked by the Player and makes a draw.
+            //           d) Else if the Computer marked the center in the 1st move, its 2nd mark should
+            //                  d1) block a line containing the sign of the Player and 2 empty fields AND
+            //                  d2) the 1st mark of the Player should be NOT on the line formed by the Computer's signs.
+            else if (count_empty_fields() == 7 && m.Goes_First == Model_Helper.Players.Computer)
+            {
+                find_first_field_occupied_by(1, 0, 0, out _row, out _col);
+                temp_point = new Point(_row, _col); // the field marked by Computer
+                find_first_field_occupied_by(0, 0, 0, out _row, out _col);
+                temp_point2 = new Point(_row, _col); // the field marked by Player
+                // Cases a) & b); Player = 0, occupied by Computer = 1, empty = 2
+                if (is_Point_at_corner(temp_point) == true && is_Point_at_corner(temp_point2) == true)
+                {
+                    if (find_outer_field(temp_point, false, 4) == temp_point2) // Case a): the opposite corner
+                    {
+                        random = rnd.Next(2);
+                        if (random == 0)
+                            temp_bool = false;
+                        else if (random == 1)
+                            temp_bool = true;
+                        temp_point = find_outer_field(temp_point, temp_bool, 2);
+                        _row = temp_point.Row;
+                        _col = temp_point.Col;
+                        return;
+                    }    
+                    else if (find_outer_field(temp_point, false, 2) == temp_point2)
+                    { // Case b): Computer marked a corner, Player marked an adjacent corner anti-clockwise
+                        temp_point = find_outer_field(temp_point, true, 1); // clockwise the adjacent edge middle
+                        _row = temp_point.Row;
+                        _col = temp_point.Col;
+                        return;
+                    }
+                    else if (find_outer_field(temp_point, true, 2) == temp_point2)
+                    { // Case b): Computer marked a corner, Player marked an adjacent corner clockwise
+                        temp_point = find_outer_field(temp_point, false, 1); // anti-clockwise the adjacent edge middle
+                        _row = temp_point.Row;
+                        _col = temp_point.Col;
+                        return;
+                    }
+                }
+
             }
         }
         #endregion Hard
