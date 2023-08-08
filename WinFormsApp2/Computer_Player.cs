@@ -1408,7 +1408,46 @@ namespace WinFormsApp2
                         return;
                     }
                 }
-
+                // Case c)
+                else if (is_Point_at_corner(temp_point) == true && temp_point2 == new Point(1, 1))
+                {
+                    temp_point = find_outer_field(temp_point, false, 4);
+                    _row = temp_point.Row;
+                    _col = temp_point.Col;
+                    return;
+                }
+                // Case d)
+                if (temp_point == new Point(1, 1))
+                {
+                    if(is_Point_at_edge_middle(temp_point2) == true) // Player marked an edge middle
+                    {
+                        random = rnd.Next(2);
+                        if (random == 0)
+                            temp_bool = false;
+                        else if (random == 1)
+                            temp_bool = true;
+                        temp_point = find_outer_field(temp_point2, temp_bool, 1);
+                        _row = temp_point.Row;
+                        _col = temp_point.Col;
+                    }
+                    else if (is_Point_at_corner(temp_point2) == true) // Player marked a corner
+                    {
+                        random = rnd.Next(4);
+                        if (random == 0)
+                        {
+                            temp_bool = false;
+                        }
+                        else if 
+                        else if (random >= 2)
+                        {
+                            temp_bool = true;
+                        }
+                            
+                        temp_point = find_outer_field(temp_point2, temp_bool, 1);
+                        _row = temp_point.Row;
+                        _col = temp_point.Col;
+                    }
+                }
             }
         }
         #endregion Hard
