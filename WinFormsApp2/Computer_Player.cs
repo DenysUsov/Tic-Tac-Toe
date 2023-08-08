@@ -1417,7 +1417,7 @@ namespace WinFormsApp2
                     return;
                 }
                 // Case d)
-                if (temp_point == new Point(1, 1))
+                else if (temp_point == new Point(1, 1))
                 {
                     if(is_Point_at_edge_middle(temp_point2) == true) // Player marked an edge middle
                     {
@@ -1435,19 +1435,36 @@ namespace WinFormsApp2
                         random = rnd.Next(4);
                         if (random == 0)
                         {
-                            temp_bool = false;
+                            temp_point = find_outer_field(temp_point2, false, 1);
+                            _row = temp_point.Row;
+                            _col = temp_point.Col;
+                            return;
                         }
-                        else if 
-                        else if (random >= 2)
+                        else if (random == 1)
                         {
-                            temp_bool = true;
+                            temp_point = find_outer_field(temp_point2, false, 2);
+                            _row = temp_point.Row;
+                            _col = temp_point.Col;
+                            return;
                         }
-                            
-                        temp_point = find_outer_field(temp_point2, temp_bool, 1);
-                        _row = temp_point.Row;
-                        _col = temp_point.Col;
+                        else if (random == 2)
+                        {
+                            temp_point = find_outer_field(temp_point2, true, 1);
+                            _row = temp_point.Row;
+                            _col = temp_point.Col;
+                            return;
+                        }
+                        else if (random == 3)
+                        {
+                            temp_point = find_outer_field(temp_point2, true, 2);
+                            _row = temp_point.Row;
+                            _col = temp_point.Col;
+                            return;
+                        }
                     }
                 }
+                // Case e)
+
             }
         }
         #endregion Hard
