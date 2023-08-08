@@ -1187,6 +1187,77 @@ namespace WinFormsApp2
         //    General rule of the 5th high priority: if the Computer is going to put its 2nd sign on a line containing already its sign while the other two fields are empty,
         // it may only do it so, if the remaining empty field on the line does not lie on crossing lines exclusively occupied by the Player (to avoid inducing Player's fork).
         //    General rule: the Computer should occupy lines already occupied by the Player so that they are not exclusively occupied by the Player.
+        
+        // This method returns a Point from the shell of the playground distanced by the input number of fields ( min 1 - max 7) counted from the given Point
+        // on the shell along the shell so that the start Point counted as 0 in the given direction: false - anticlockwise, true - clockwise.
+        private Point find_outer_field(Point p, bool direction, int distance)
+        {
+            Point output = new Point(p.Row, p.Col);
+            int count = 0;
+            if (direction == false) // anti-clockwise
+            {
+                while (count < distance)
+                {
+                    if (output.Row == 0 && output.Col > 0)
+                    {
+                        output.Col--;
+                        count++;
+                        continue;
+                    }
+                    else if (output.Row < 2 && output.Col == 0)
+                    {
+                        output.Row++;
+                        count++;
+                        continue;
+                    }
+                    else if (output.Row == 2 && output.Col < 2)
+                    {
+                        output.Col++;
+                        count++;
+                        continue;
+                    }
+                    else if (output.Row > 0 && output.Col == 2)
+                    {
+                        output.Row--;
+                        count++;
+                        continue;
+                    }
+                }
+            }
+            else if (direction == true) // clockwise
+            {
+                while (count < distance)
+                {
+                    if (output.Row == 0 & output.Col < 2)
+                    {
+                        output.Col++;
+                        count++;
+                        continue;
+                    }
+                    else if (output.Row < 2 && output.Col == 2)
+                    {
+                        output.Row++;
+                        count++;
+                        continue;
+                    }
+                    else if (output.Row == 2 && output.Col > 0)
+                    {
+                        output.Col--;
+                        count++;
+                        continue;
+                    }
+                    else if (output.Row > 0 && output.Col == 0)
+                    {
+                        output.Row--;
+                        count++;
+                        continue;
+                    }
+                }
+            }
+            
+            return output;
+        }
+        
         private void computers_move_hard(out int _row, out int _col)
         {
             _row = -1;
