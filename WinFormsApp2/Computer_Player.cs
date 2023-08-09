@@ -1162,6 +1162,22 @@ namespace WinFormsApp2
         //           d) Else if the Computer marked the center in the 1st move, its 2nd mark should
         //                  d1) block a line containing the sign of the Player and 2 empty fields AND
         //                  d2) the 1st mark of the Player should be NOT on the line formed by the Computer's signs.
+        //           e) Else if Computer marked a corner and Player marked an edge middle. 
+        //                  e1) If Player marked an adjacent edge middle, Computer marks the othe adjacent edge middle to force Player to mark the last free field
+        //                      on the edge occupied by Computer. Computer marks the center then and makes a fork.
+        //                  e2) If Player marks a non-adjacent edge middle, Computer marks any corner adjacent to its first corner mark making Player to mark
+        //                      the edge middle between the Computer's signs. Computer marks the center with his 3d move creating a fork.
+        //           f) Else if Computer marks an edge middle and Player marks the center, Computer marks
+        //                   f1) a corner at the opposite edge to control two edges (still a fork possible through the adjacent corner) or
+        //                   f2) an adjacent corner to make  Player to mark the 2nd adjacent corner (quick automatic draw).
+        //           g) Else if Computer marks an edge middle and Player marks an adjacent corner, the Computer randomly answers with one of the following options:
+        //                   g1) marking the center or
+        //                   g2) marking the corner on the edge controlled by Player but not by Computer (a fork possibility).
+        //           h) Else if Computer marks an edge middle and Player marks a corner on the opposite edge, Computer marks the adjacent corner on the edge controlled
+        //              by Player.Player is made to mark the corner opposite to the one it occupied already. Computer is made to mark the center and a fork is formed.
+        //           i) Else if Computer marks an edge middle and Player marks an adjacent edge middle, Computer marks the corner adjacent to the two signs making Player
+        //              to mark the last free field on the edge controlled by Computer. Computer marks the center creating a fork.
+        //           j) Else if Computer marks an edge middle and Player marks the opposite edge middle. Computer chooses any free field to mark randomly.
         //     If the Player moves first, the Computer prevents the Player from making forks via placing its 2nd sign onto a 3-member straight line
         //     containing its sign and two other empty fields. Before doing the move, the Computer identifies a bunch of all 3-membered straight lines
         //     containig its sign and selects only those which have other two fields empty; it selects a line from the remaining lines selected and a field in it so
