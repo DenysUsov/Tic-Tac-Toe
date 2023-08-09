@@ -1393,6 +1393,12 @@ namespace WinFormsApp2
             //                      on the edge occupied by Computer. Computer marks the center then and makes a fork.
             //                  e2) If Player marks a non-adjacent edge middle, Computer marks any corner adjacent to its first corner mark making Player to mark
             //                      the edge middle between the Computer's signs. Computer marks the center with his 3d move creating a fork.
+            //           f) Else if Computer marks an edge middle and Player marks the center, Computer marks
+            //                   f1) a corner at the opposite edge to control two edges (still a fork possible through the adjacent corner) or
+            //                   f2) an adjacent corner to make  Player to mark the 2nd adjacent corner (quick automatic draw).
+            //           g) Else if Computer marks an edge middle and Player marks an adjacent corner, the Computer randomly answers with one of the following options:
+            //                   g1) marking the center or
+            //                   g2) marking the corner on the edge controlled by Player but not by Computer (a fork possibility).
             else if (count_empty_fields() == 7 && m.Goes_First == Model_Helper.Players.Computer)
             {
                 find_first_field_occupied_by(1, 0, 0, out _row, out _col);
@@ -1515,6 +1521,31 @@ namespace WinFormsApp2
                         return;
                     } 
                 }
+                // Case f)
+                else if (is_Point_at_edge_middle(temp_point) == true && is_Point_at_center(temp_point2))
+                {
+                    random = rnd.Next(4);
+                    if (random == 0)
+                    {
+                        temp_point = find_outer_field(temp_point, false, 1);
+                    }
+                    else if (random == 1)
+                    {
+                        temp_point = find_outer_field(temp_point, false, 3);
+                    }
+                    else if (random == 2)
+                    {
+                        temp_point = find_outer_field(temp_point, true, 1);
+                    }
+                    else if (random == 3)
+                    {
+                        temp_point = find_outer_field(temp_point, true, 3);
+                    }
+                    _row = temp_point.Row;
+                    _col = temp_point.Col;
+                    return;
+                }
+                // Case g)
             }
         }
         #endregion Hard
