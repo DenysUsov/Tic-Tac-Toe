@@ -1163,7 +1163,7 @@ namespace WinFormsApp2
         //                  d1) block a line containing the sign of the Player and 2 empty fields AND
         //                  d2) the 1st mark of the Player should be NOT on the line formed by the Computer's signs.
         //           e) Else if Computer marked a corner and Player marked an edge middle. 
-        //                  e1) If Player marked an adjacent edge middle, Computer marks the othe adjacent edge middle to force Player to mark the last free field
+        //                  e1) If Player marked an adjacent edge middle, Computer marks the other adjacent edge middle to force Player to mark the last free field
         //                      on the edge occupied by Computer. Computer marks the center then and makes a fork.
         //                  e2) If Player marks a non-adjacent edge middle, Computer marks any corner adjacent to its first corner mark making Player to mark
         //                      the edge middle between the Computer's signs. Computer marks the center with his 3d move creating a fork.
@@ -1388,6 +1388,11 @@ namespace WinFormsApp2
             //           d) Else if the Computer marked the center in the 1st move, its 2nd mark should
             //                  d1) block a line containing the sign of the Player and 2 empty fields AND
             //                  d2) the 1st mark of the Player should be NOT on the line formed by the Computer's signs.
+            //           e) Else if Computer marked a corner and Player marked an edge middle. 
+            //                  e1) If Player marked an adjacent edge middle, Computer marks the other adjacent edge middle to force Player to mark the last free field
+            //                      on the edge occupied by Computer. Computer marks the center then and makes a fork.
+            //                  e2) If Player marks a non-adjacent edge middle, Computer marks any corner adjacent to its first corner mark making Player to mark
+            //                      the edge middle between the Computer's signs. Computer marks the center with his 3d move creating a fork.
             else if (count_empty_fields() == 7 && m.Goes_First == Model_Helper.Players.Computer)
             {
                 find_first_field_occupied_by(1, 0, 0, out _row, out _col);
@@ -1408,7 +1413,7 @@ namespace WinFormsApp2
                         _row = temp_point.Row;
                         _col = temp_point.Col;
                         return;
-                    }    
+                    }
                     else if (find_outer_field(temp_point, false, 2) == temp_point2)
                     { // Case b): Computer marked a corner, Player marked an adjacent corner anti-clockwise
                         temp_point = find_outer_field(temp_point, true, 1); // clockwise the adjacent edge middle
@@ -1435,7 +1440,7 @@ namespace WinFormsApp2
                 // Case d)
                 else if (temp_point == new Point(1, 1))
                 {
-                    if(is_Point_at_edge_middle(temp_point2) == true) // Player marked an edge middle
+                    if (is_Point_at_edge_middle(temp_point2) == true) // Player marked an edge middle
                     {
                         random = rnd.Next(2);
                         if (random == 0)
@@ -1480,7 +1485,36 @@ namespace WinFormsApp2
                     }
                 }
                 // Case e)
-
+                else if (is_Point_at_corner(temp_point) && is_Point_at_edge_middle(temp_point2))
+                {
+                    if (find_outer_field(temp_point, false, 1) == temp_point2)
+                    { // e1) anti-clockwise
+                        temp_point = find_outer_field(temp_point, true, 1); // clockwise
+                        _row = temp_point.Row;
+                        _col = temp_point.Col;
+                        return;
+                    }
+                    else if (find_outer_field(temp_point, true, 1) == temp_point2)
+                    { // e1) clockwise
+                        temp_point = find_outer_field(temp_point, true, 1); // anti-clockwise
+                        _row = temp_point.Row;
+                        _col = temp_point.Col;
+                        return;
+                    }
+                    else if (find_outer_field(temp_point, false, 3) == temp_point2 ||
+                        find_outer_field(temp_point, true, 3) == temp_point2)
+                    { // e2) both anti-clockwise and clockwise
+                        random = rnd.Next(2);
+                        if (random == 0)
+                            temp_bool = false;
+                        else if (random == 1)
+                            temp_bool = true;
+                        temp_point = find_outer_field(temp_point, temp_bool, 2);
+                        _row = temp_point.Row;
+                        _col = temp_point.Col;
+                        return;
+                    } 
+                }
             }
         }
         #endregion Hard
