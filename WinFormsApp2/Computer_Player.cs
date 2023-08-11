@@ -1401,6 +1401,8 @@ namespace WinFormsApp2
             //                   g2) marking the corner on the edge controlled by Player but not by Computer (a fork possibility).
             //           h) Else if Computer marks an edge middle and Player marks a corner on the opposite edge, Computer marks the adjacent corner on the edge controlled
             //              by Player. Player is made to mark the corner opposite to the one it occupied already. Computer is made to mark the center and a fork is formed.
+            //           i) Else if Computer marks an edge middle and Player marks an adjacent edge middle, Computer marks the corner adjacent to the two signs making Player
+            //              to mark the last free field on the edge controlled by Computer. Computer marks the center creating a fork.
             else if (count_empty_fields() == 7 && m.Goes_First == Model_Helper.Players.Computer)
             {
                 find_first_field_occupied_by(1, 0, 0, out _row, out _col);
@@ -1599,8 +1601,23 @@ namespace WinFormsApp2
                     _col = temp_point.Col;
                     return;
                 }
-                // Case i)
-
+                // Case i) - Player's sign at the middle of the adjacent edge anti-clockwise
+                else if (is_Point_at_edge_middle(temp_point) && find_outer_field(temp_point, false, 2) == temp_point2)
+                {
+                    temp_point = find_outer_field(temp_point, false, 1); // adjacent corner to Computer's sign anti-clockwise
+                    _row = temp_point.Row;
+                    _col = temp_point.Col;
+                    return;
+                }
+                // Case i) - Player's sign at the middle of the adjacent edge clockwise
+                else if (is_Point_at_edge_middle(temp_point) && find_outer_field(temp_point, true, 2) == temp_point2)
+                {
+                    temp_point = find_outer_field(temp_point, true, 1); // adjacent corner to Computer's sign clockwise
+                    _row = temp_point.Row;
+                    _col = temp_point.Col;
+                    return;
+                }
+                // Case j)
             }
         }
         #endregion Hard
