@@ -1403,6 +1403,7 @@ namespace WinFormsApp2
             //              by Player. Player is made to mark the corner opposite to the one it occupied already. Computer is made to mark the center and a fork is formed.
             //           i) Else if Computer marks an edge middle and Player marks an adjacent edge middle, Computer marks the corner adjacent to the two signs making Player
             //              to mark the last free field on the edge controlled by Computer. Computer marks the center creating a fork.
+            //           j) Else if Computer marks an edge middle and Player marks the opposite edge middle. Computer chooses any free field to mark randomly.
             else if (count_empty_fields() == 7 && m.Goes_First == Model_Helper.Players.Computer)
             {
                 find_first_field_occupied_by(1, 0, 0, out _row, out _col);
@@ -1618,6 +1619,11 @@ namespace WinFormsApp2
                     return;
                 }
                 // Case j)
+                else if (is_Point_at_edge_middle(temp_point) && find_outer_field(temp_point, false, 4) == temp_point2)
+                {
+                    computers_move_simple(out _row, out _col);
+                    return;
+                }
             }
         }
         #endregion Hard
