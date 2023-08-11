@@ -1545,7 +1545,44 @@ namespace WinFormsApp2
                     _col = temp_point.Col;
                     return;
                 }
-                // Case g)
+                // Case g) - Player's sign in adjacent corner anti-clockwise
+                else if (is_Point_at_edge_middle(temp_point) && find_outer_field(temp_point, false, 1) == temp_point2)
+                {
+                    random = rnd.Next(2);
+                    if (random == 0)
+                    {
+                        _row = 1;
+                        _col = 1;
+                        return;
+                    }
+                    else if (random == 1) 
+                    {
+                        temp_point = find_outer_field(temp_point, false, 3); // corner anti-clockwise at the common edge with Player's sign
+                        _row = temp_point.Row;
+                        _col = temp_point.Col;
+                        return;
+                    }
+                }
+                // Case g) - Player's sign in adjacent corner clockwise
+                else if (is_Point_at_edge_middle(temp_point) && find_outer_field(temp_point, true, 1) == temp_point2)
+                {
+                    random = rnd.Next(2);
+                    if (random == 0) // center
+                    {
+                        _row = 1;
+                        _col = 1;
+                        return;
+                    }
+                    else if (random == 1)
+                    {
+                        temp_point = find_outer_field(temp_point, true, 3); // corner clockwise at the common edge with Player's sign
+                        _row = temp_point.Row;
+                        _col = temp_point.Col;
+                        return;
+                    }
+                }
+                // Case h)
+
             }
         }
         #endregion Hard
