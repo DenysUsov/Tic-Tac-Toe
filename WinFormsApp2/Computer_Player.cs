@@ -1625,6 +1625,61 @@ namespace WinFormsApp2
                     return;
                 }
             }
+            // Move >=3: general strategy
+            //    3.1 General rule of the highest priority: if there are two signs of the Computer on one 3-membered straight line, and the third field on the line is empty,
+            // the Computer should go on to that empty field to immediately win.
+            //    3.2 General rule of the 2nd high priority: if there are two signs of the Player on one 3-membered straight line an the third field on the line is emtpy,
+            // the Computer should go to any such a field to prevent the Player from winning in the next move.
+            //    3.3 General rule of the 3d high priority: if there are at least two signs (maximum 3 possible) of the Computer located not on one common 3-membered straight line,
+            // or there are two signs of the Computer on one common 3-membered straight line and a sign of the Player on the same 3-membered straight line,
+            // the Computer identifies own possible future forks:
+            //                         3.3a) it identifes a bunch of all 3-membered straight lines passing through each of its signs;
+            //                         3.3b) the Computer discards all identified 3-membered lines containing Player's sign;
+            //                         3.3c) the Computer identifies all crosses between the remaining 3-membered straight lines belonging to different bunches
+            //                              and moves to any of the identified crosses.
+            //    3.4 General rule of the 4th high priority: if there are at least two signs of the Player (of totally maximum three signs of the Player) located
+            // not on one 3-membered straight line or there are two signs of the Player on one common 3-membered straight line and a sign of the Computer on the same
+            // 3-membered straight line, the Computer should identify the empty crosses of the 3-membered straight lines containing the signs of the Player. If there is only
+            // one such empty cross, the Computer should mark it. Else if there are more than 1 such empty crosses, the Computer should mark a field on a 3-membered straight line
+            // occupied by the Computer exclusively so that the remaining empty field on the line IS NOT a one of the identifed empty crosses. If this is not possible,
+            // the Computer marks any of the identified empty crosses (with a possibility to lose, if the Player plays well).
+            //    3.5 General rule of the 5th high priority: if the Computer is going to put its 2nd sign on a line containing already its sign while the other two fields are empty,
+            // it may only do it so, if the remaining empty field on the line does not lie on crossing lines exclusively occupied by the Player (to avoid inducing Player's fork).
+            //    3.6 General rule: the Computer should occupy lines already occupied by the Player so that they are not exclusively occupied by the Player.
+            else if (count_empty_fields() <= 5)
+            {
+                Computer_point_list.Clear();
+                Computer_point_list = fields_occupied_by(1); // get List of fields occupied by Computer (1)
+                Player_point_list.Clear();
+                Player_point_list = fields_occupied_by(0); // get List of fields occupied by Player (0)
+
+                // 3.1 checking all possible point pairs in the Computer_point_list, if any two of them are on the same row, col or diagonal and,
+                // if yes, then if the third point on that line is empty, save its coordinates to p
+                // otherwise return (-1, -1)
+                Point p = first_empty_field_on_any_line_between_any_fields_in_list(Computer_point_list);
+                if (p.Row != -1 && p.Col != -1) // If there exists a line containing two sings of Computer and a free third field,
+                                                // Computer moves there to win
+                {
+                    _row = p.Row;
+                    _col = p.Col;
+                    return;
+                }
+                else
+                {
+                    // 3.2 checking all possible point pairs in the Player_point_list, if any two of them are on the same row, col or diagonal and,
+                    // if yes, then if the third point on that line is empty, save its coordinates to p
+                    // otherwise retur (-1, -1)
+                    p = first_empty_field_on_any_line_between_any_fields_in_list(Player_point_list);
+                    if (p.Row != -1 && p.Col != -1)
+                    {
+                        _row = p.Row;
+                        _col = p.Col;
+                        return;
+                    }
+                    
+                }
+
+            }
         }
         #endregion Hard
     }
