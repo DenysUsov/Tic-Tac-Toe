@@ -1274,9 +1274,8 @@ namespace WinFormsApp2
             return output;
         }
         // Checks all possible point pairs in the point list, if any two of them are on the same row, col or diagonal and
-        // if yes, then return the coordinates of the first empty point lying on any of those lines;
-        // if not, then return (-1, -1).
-        // The list must contain at least 2 members for the correct work of the method
+        // if yes, then finds empty points lying on any of those lines and adds them to the List<Point> to be returned;
+        // The list must contain at least 2 members for the correct work of the method.
         private List<Point> empty_fields_on_lines_between_any_two_fields_in_list(List<Point> fields)
         {
             Point p = new Point(-1, -1);
