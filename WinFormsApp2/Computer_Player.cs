@@ -1276,6 +1276,7 @@ namespace WinFormsApp2
         // Checks all possible point pairs in the point list, if any two of them are on the same row, col or diagonal and
         // if yes, then finds empty points lying on any of those lines and adds them to the List<Point> to be returned;
         // The list must contain at least 2 members for the correct work of the method.
+        // The method removes dublicates.
         private List<Point> empty_fields_on_lines_between_any_two_fields_in_list(List<Point> fields)
         {
             Point p = new Point(-1, -1);
@@ -1298,6 +1299,7 @@ namespace WinFormsApp2
                     }
                 }
             }
+            list_of_points = remove_dublicates(list_of_points);
             return list_of_points;
         }
 
@@ -1338,15 +1340,9 @@ namespace WinFormsApp2
             }
             else if (intersections_list.Count > 1)
             {
-                Point p = first_empty_field_on_any_line_between_any_fields_in_list(Computer_point_list);
-                if (p.Row != -1 && p.Col != -1) // If there exists a line containing two sings of Computer and a free third field,
-                                                // Computer moves there to win
-                {
-                    _row = p.Row;
-                    _col = p.Col;
-                    return;
-                }
-                else
+                List<Point> list_of_points  = empty_fields_on_lines_between_any_two_fields_in_list(Computer_point_list);
+                list_of_points = remove_dublicates(list_of_points);
+                for (int i = 0; i < list_of_points.Count; i++)
                 {
 
                 }
