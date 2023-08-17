@@ -1273,6 +1273,86 @@ namespace WinFormsApp2
             
             return output;
         }
+        // Checks all possible point pairs in the point list, if any two of them are on the same row, col or diagonal and
+        // if yes, then return the coordinates of the first empty point lying on any of those lines;
+        // if not, then return (-1, -1).
+        // The list must contain at least 2 members for the correct work of the method
+        private List<Point> empty_fields_on_lines_between_any_two_fields_in_list(List<Point> fields)
+        {
+            Point p = new Point(-1, -1);
+            List<Point> list_of_points = new List<Point>();
+
+            for (int i = 0; i < fields.Count; i++)
+            {
+                if (i < fields.Count)
+                {
+                    for (int j = i + 1; j < fields.Count; j++)
+                    {
+                        if (are_the_two_points_on_the_same_line(fields[i], fields[j]) == true)
+                        {
+                            p = third_Point_on_the_line(fields[i], fields[j]);
+                            if (m[p.Row, p.Col] == 2) // if the 3d Point on the common line is NOT occupied, stop searching
+                            {
+                                list_of_points.Add(p);
+                            }
+                        }
+                    }
+                }
+            }
+            return list_of_points;
+        }
+
+        //    General rule of the 4th high priority: if there are at least two signs of the Player (of totally maximum three signs of the Player) located
+        // not on one 3-membered straight line or there are two signs of the Player on one common 3-membered straight line and a sign of the Computer on the same
+        // 3-membered straight line, the Computer should identify the empty crosses of the 3-membered straight lines containing the signs of the Player. If there is only
+        // one such empty cross, the Computer should mark it. Else if there are more than 1 such empty crosses, the Computer should mark a field on a 3-membered straight line
+        // occupied by the Computer exclusively so that the remaining empty field on the line IS NOT a one of the identifed empty crosses. If this is not possible,
+        // the Computer marks any of the identified empty crosses (with a possibility to lose, if the Player plays well).
+        private void Cmove3_rule4(out int _row, out int _col)
+        {
+            _row = -1;
+            _col = -1;
+            // returns a List<Point> of all intersections of 3-member-lines (each containing a field occupied by Player or Computer but NOT its competitor)
+            // or returns null, if:
+            // the number of Points in the list is 0, 1, more than 3, or
+            // at least two of the points lie on the same line, or
+            // or return an empty list with Count == 0, if the intersections are useless, since the intersected lines contain Competitor's sign
+            List<Point>? intersections_list = intersections(Player_point_list);
+
+            // removes occupied fields from the intersections list
+            if (intersections_list != null && intersections_list.Count > 0)
+                intersections_list = remove_occupied_fields(intersections_list);
+
+
+            if (intersections_list == null)
+            {
+                MessageBox.Show("Cmove3_rule4 method got null intersections_list");
+                throw new Exception("Cmove3_rule4 method got null intersections_list");
+            }
+            else if (intersections_list.Count == 0)
+                return;
+            else if (intersections_list.Count == 1)
+            {
+                _row = intersections_list[0].Row;
+                _col = intersections_list[0].Col;
+                return;
+            }
+            else if (intersections_list.Count > 1)
+            {
+                Point p = first_empty_field_on_any_line_between_any_fields_in_list(Computer_point_list);
+                if (p.Row != -1 && p.Col != -1) // If there exists a line containing two sings of Computer and a free third field,
+                                                // Computer moves there to win
+                {
+                    _row = p.Row;
+                    _col = p.Col;
+                    return;
+                }
+                else
+                {
+
+                }
+            }    
+        }
         
         private void computers_move_hard(out int _row, out int _col)
         {
