@@ -1313,6 +1313,9 @@ namespace WinFormsApp2
         {
             _row = -1;
             _col = -1;
+            Random rnd = new Random();
+            int random;
+            bool Point_at_j_to_remove = false;
             // returns a List<Point> of all intersections of 3-member-lines (each containing a field occupied by Player or Computer but NOT its competitor)
             // or returns null, if:
             // the number of Points in the list is 0, 1, more than 3, or
@@ -1330,21 +1333,42 @@ namespace WinFormsApp2
                 MessageBox.Show("Cmove3_rule4 method got null intersections_list");
                 throw new Exception("Cmove3_rule4 method got null intersections_list");
             }
-            else if (intersections_list.Count == 0)
+            else if (intersections_list.Count == 0) // there are no empty intersections
                 return;
-            else if (intersections_list.Count == 1)
+            else if (intersections_list.Count == 1) // there is only 1 empty intersection
             {
                 _row = intersections_list[0].Row;
                 _col = intersections_list[0].Col;
                 return;
             }
-            else if (intersections_list.Count > 1)
+            else if (intersections_list.Count > 1) // there are more than 1 empty intersections (danger of a fork by Player)
             {
                 List<Point> list_of_points  = empty_fields_on_lines_between_any_two_fields_in_list(Computer_point_list);
-                list_of_points = remove_dublicates(list_of_points);
-                for (int i = 0; i < list_of_points.Count; i++)
+                for (int i = 0; i < intersections_list.Count; i++)
                 {
-
+                    for (int j = 0; j < list_of_points.Count; j++)
+                    {
+                        if (list_of_points[j].Row == intersections_list[i].Row &&
+                            list_of_points[j].Col == intersections_list[i].Col)
+                        {
+                            list_of_points.RemoveAt(j);
+                            j--;
+                        }
+                    }
+                }
+                if (list_of_points.Count > 0)
+                {
+                    random = rnd.Next(list_of_points.Count);
+                    _row = list_of_points[random].Row;
+                    _col = list_of_points[random].Col;
+                    return;
+                }
+                else // (list_of_points.Count == 0)
+                {
+                    random = rnd.Next(intersections_list.Count);
+                    _row = intersections_list[random].Row;
+                    _col = intersections_list[random].Col;
+                    return;
                 }
             }    
         }
