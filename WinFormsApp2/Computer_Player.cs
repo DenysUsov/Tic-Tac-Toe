@@ -1372,7 +1372,7 @@ namespace WinFormsApp2
                 }
             }
         }
-
+        
         private void computers_move_hard(out int _row, out int _col)
         {
             _row = -1;
@@ -1381,6 +1381,11 @@ namespace WinFormsApp2
             int random = -1;
             bool temp_bool = false;
             Point temp_point, temp_point2;
+
+            Computer_point_list.Clear();
+            Computer_point_list = fields_occupied_by(1); // get List of fields occupied by Computer (1)
+            Player_point_list.Clear();
+            Player_point_list = fields_occupied_by(0); // get List of fields occupied by Player (0)
 
             // 1st move. 
             if (count_empty_fields() == 9)
@@ -1747,10 +1752,7 @@ namespace WinFormsApp2
             //    3.6 General rule: the Computer should occupy lines already occupied by the Player so that they are not exclusively occupied by the Player.
             else if (count_empty_fields() <= 5)
             {
-                Computer_point_list.Clear();
-                Computer_point_list = fields_occupied_by(1); // get List of fields occupied by Computer (1)
-                Player_point_list.Clear();
-                Player_point_list = fields_occupied_by(0); // get List of fields occupied by Player (0)
+               
 
                 // 3.1 checking all possible point pairs in the Computer_point_list, if any two of them are on the same row, col or diagonal and,
                 // if yes, then if the third point on that line is empty, save its coordinates to p
