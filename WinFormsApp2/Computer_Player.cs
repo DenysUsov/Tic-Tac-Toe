@@ -1775,8 +1775,38 @@ namespace WinFormsApp2
                         _col = p.Col;
                         return;
                     }
-                    
-                }
+                    // 3.3
+                    else
+                    {
+                        // returns a List<Point> of all intersections of 3-member-lines (each containing a field occupied by Player or Computer but NOT its competitor)
+                        // or returns null, if:
+                        // the number of Points in the list is 0, 1, more than 3, or
+                        // at least two of the points lie on the same line, or
+                        // or return an empty list with Count == 0, if the intersections are useless, since the intersected lines contain Player's sign
+                        List<Point>? intersections_list = intersections(Computer_point_list);
+
+                        // removes occupied fields from the intersections list
+                        if (intersections_list != null && intersections_list.Count > 0)
+                            intersections_list = remove_occupied_fields(intersections_list);
+                        if (intersections_list != null && intersections_list.Count > 0)
+                        {
+                            random = rnd.Next(intersections_list.Count);
+                            _row = intersections_list[random].Row;
+                            _col = intersections_list[random].Col;
+                            return;
+                        }
+                        // 3.4
+                        else
+                        {
+                            Cmove3_rule4(out _row, out _col);
+                            if (_row != -1 && _col != -1)
+                                return;
+                            else
+                            {
+
+                            }
+                        }
+                    }
 
             }
         }
