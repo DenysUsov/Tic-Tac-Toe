@@ -60,7 +60,7 @@ namespace WinFormsApp2
             Computer_point_list = new List<Point>();
             Player_point_list = new List<Point>();
         }
-        
+
         public void computers_move() // calls Computer's move subroutine according to the game difficulty level
         {
             int _row = -1;
@@ -903,7 +903,7 @@ namespace WinFormsApp2
             Random rnd = new Random();
             int random = -1;
             _row = -1; _col = -1;
-            
+
             try
             {
                 Player_point_list.Clear();
@@ -921,7 +921,7 @@ namespace WinFormsApp2
                      //           of the 3-field-lines containing signs of Player and moves randomly to one of them
                 {
                     List<Point>? intersections_list = intersections(Player_point_list);
-                    
+
                     // removes occupied fields from the intersections list
                     if (intersections_list != null && intersections_list.Count > 0)
                         intersections_list = remove_occupied_fields(intersections_list);
@@ -967,7 +967,7 @@ namespace WinFormsApp2
             {
                 Console.WriteLine(ex.Message);
             }
-            
+
         }
 
         // Medium level.
@@ -1013,7 +1013,7 @@ namespace WinFormsApp2
                     {
                         random = rnd.Next(2);
                         int counter = -1;
-                        for (int i = 0; i<3; i++)
+                        for (int i = 0; i < 3; i++)
                         {
                             if (m[c_row, i] == 2)
                             {
@@ -1104,7 +1104,7 @@ namespace WinFormsApp2
                     // if yes, then if the third point on that line is empty, save its coordinates to p
                     // otherwise return (-1, -1)
                     Point p = first_empty_field_on_any_line_between_any_fields_in_list(Computer_point_list);
-                    
+
                     if (p.Row != -1 && p.Col != -1) // If there exists a line containing two sings of Computer and a free third field,
                                                     // Computer moves there to win
                     {
@@ -1203,7 +1203,7 @@ namespace WinFormsApp2
         //    General rule of the 5th high priority: if the Computer is going to put its 2nd sign on a line containing already its sign while the other two fields are empty,
         // it may only do it so, if the remaining empty field on the line does not lie on crossing lines exclusively occupied by the Player (to avoid inducing Player's fork).
         //    General rule: the Computer should occupy lines already occupied by the Player so that they are not exclusively occupied by the Player.
-        
+
         // This method returns a Point from the shell of the playground distanced by the input number of fields ( min 1 - max 7) counted from the given Point
         // on the shell along the shell so that the start Point counted as 0 in the given direction: false - anticlockwise, true - clockwise.
         private Point find_outer_field(Point p, bool direction, int distance)
@@ -1270,7 +1270,7 @@ namespace WinFormsApp2
                     }
                 }
             }
-            
+
             return output;
         }
         // Checks all possible point pairs in the point list, if any two of them are on the same row, col or diagonal and
@@ -1343,7 +1343,7 @@ namespace WinFormsApp2
             }
             else if (intersections_list.Count > 1) // there are more than 1 empty intersections (danger of a fork by Player)
             {
-                List<Point> list_of_points  = empty_fields_on_lines_between_any_two_fields_in_list(Computer_point_list);
+                List<Point> list_of_points = empty_fields_on_lines_between_any_two_fields_in_list(Computer_point_list);
                 for (int i = 0; i < intersections_list.Count; i++)
                 {
                     for (int j = 0; j < list_of_points.Count; j++)
@@ -1370,9 +1370,9 @@ namespace WinFormsApp2
                     _col = intersections_list[random].Col;
                     return;
                 }
-            }    
+            }
         }
-        
+
         private void computers_move_hard(out int _row, out int _col)
         {
             _row = -1;
@@ -1623,7 +1623,7 @@ namespace WinFormsApp2
                         _row = temp_point.Row;
                         _col = temp_point.Col;
                         return;
-                    } 
+                    }
                 }
                 // Case f)
                 else if (is_Point_at_edge_middle(temp_point) == true && is_Point_at_center(temp_point2))
@@ -1659,7 +1659,7 @@ namespace WinFormsApp2
                         _col = 1;
                         return;
                     }
-                    else if (random == 1) 
+                    else if (random == 1)
                     {
                         temp_point = find_outer_field(temp_point, false, 3); // corner anti-clockwise at the common edge with Player's sign
                         _row = temp_point.Row;
@@ -1808,10 +1808,10 @@ namespace WinFormsApp2
                         }
                     }
 
+                }
             }
+            #endregion Hard
         }
-        #endregion Hard
+
     }
-
-
 }
