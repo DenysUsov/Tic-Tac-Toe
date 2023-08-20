@@ -1373,7 +1373,27 @@ namespace WinFormsApp2
                 }
             }
         }
-        
+        //    3.6 General rule: the Computer should occupy lines already occupied by the Player so that they are not exclusively occupied by the Player.
+        //        The method returns an integer array of counts for each empty field in the playground listed in Empty_point_list (a field of the Class Computer_Player)
+        private int[] Cmove3_rule6()
+        {
+            // an array containing counts for each empty point in the playground
+            // each count for a point means that it provides control over a 3-member straight line marked by Player only
+            int[] empty_point_counts = new int[Empty_point_list.Count];
+            for (int i = 0; i < Empty_point_list.Count; i++)
+            {
+                foreach (Point p2 in Player_point_list)
+                {
+                    if (are_the_two_points_on_the_same_line(Empty_point_list[i], p2) == true)
+                    {
+                        Point p3 = third_Point_on_the_line(Empty_point_list[i], p2);
+                        if (m[p3.Row, p3.Col] == 2 || m[p3.Row, p3.Col] == 0) // if the third field on the 3-member straight line is empty or marked by Player
+                            empty_point_counts[i]++; // than add a count to the empty_point_counts[i]
+                    }
+                }
+            }
+            return empty_point_counts;
+        }
         private void computers_move_hard(out int _row, out int _col)
         {
             _row = -1;
