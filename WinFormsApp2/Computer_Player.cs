@@ -1383,7 +1383,7 @@ namespace WinFormsApp2
         // -2 no Player's fork forced but Computer's fork formed.
         // This method uses the advantage that the major method computers_move_hard calculates Computer_point_list and Player_point_list in the very beginning
         // so that they are newly updated before that method calls the present method.
-        private int rule_3_5_check_forks(int row, int col)
+        private int Cmove3_rule5_check_forks(int row, int col)
         {
             if (m[row, col] != 2) // if the input field is not empty
                 return 3;
@@ -1874,7 +1874,7 @@ namespace WinFormsApp2
                                 return;
                             else
                             {
-
+                                
                             }
                         }
                     }
