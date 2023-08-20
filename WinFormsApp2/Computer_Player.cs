@@ -1394,6 +1394,76 @@ namespace WinFormsApp2
             }
             return empty_point_counts;
         }
+        //    3.5 General rule of the 5th high priority: if the Computer is going to put its sign on a line containing already its sign while the other two fields are still empty,
+        // it may only do it so, if the remaining empty field on the line does not lie on crossing lines exclusively occupied by the Player (to avoid inducing Player's fork).
+        // The method takes row and col coordinates of the field where Computer would like to go and outputs:
+        // 0 if no Player's fork to be induced and no Computer's fork formed,
+        // 1 Player's fork is forced but there is no Computer's fork,
+        // 2 there is no any empty field on the 3-membered lines containing the input empty field and the fields marked by Computer
+        // 3 the input field is not empty
+        // -1 Player's fork forced and Computer's fork formed, or
+        // -2 no Player's fork forced but Computer's fork formed.
+        // This method uses the advantage that the major method computers_move_hard calculates Computer_point_list and Player_point_list in the very beginning
+        // so that they are newly updated before that method calls the present method.
+        private int Cmove3_rule5_check_forks(int row, int col)
+        {
+            if (m[row, col] != 2) // if the input field is not empty
+                return 3;
+
+            bool is_Players_fork = false;
+            Point targeted_p = new Point(row, col);
+            List<Point> e_points = new List<Point>(); // list of empty fields lying on the 3-membered lines marked at least once by Computer and containing the input field 
+            
+            foreach (Point p in Computer_point_list)
+            {
+                if (are_the_two_points_on_the_same_line(targeted_p, p) == true)
+                {
+                    Point p3d = third_Point_on_the_line(targeted_p, p);
+                    if (m[p3d.Row, p3d.Col] == 2) // 2 - an empty field
+                        e_points.Add(p3d); // adding found empty fields to a list of points
+                }
+            }
+            remove_dublicates(e_points); // there should be no dublicates since straight lines cross only at not more than one point (p)
+            if (e_points.Count == 0)
+                return 2;
+            // if points.Count > 1, it means a fork by Computer
+            // checking the list points for possible Player's forks
+            int[] count_p = new int[e_points.Count]; // count[i] - counts number of common 3-member straight lines of point[i] with Players_point_list 
+            foreach (Point p in Player_point_list)
+            {
+                for (int i = 0; i < e_points.Count; i++)
+                {
+                    count_p[i] = 0; //   if count[i] becomes > 1, it means Player's fork forced by Computer's move
+                    if (are_the_two_points_on_the_same_line(p, e_points[i]) == true)
+                    {
+                        Point pp = third_Point_on_the_line(p, e_points[i]);
+                        if (m[pp.Row, pp.Col] == 2 || m[pp.Row, pp.Col] == 0) // Player = 0, occupied by Computer = 1, empty = 2
+                            count_p[i]++;
+                    }
+                }
+            }
+            // if any count_p[i] > 1 it means a fork by Player
+            //         if e_points.Count > 1 => result = -1
+            //         else if e_points.Count == 1 => result = 1
+            // else if count_p[i] <= 1 at all i means no fork by Player
+            //         if e_points.Count > 1 => result = -2
+            //         else if e_point.Count == 1 => result = 0
+            foreach (int r in count_p)
+            {
+                if (r > 1)
+                    is_Players_fork = true;
+            }
+            if (is_Players_fork == true && e_points.Count > 1)
+                return -1;
+            else if (is_Players_fork == true && e_points.Count == 1)
+                return 1;
+            else if (is_Players_fork == false && e_points.Count > 1)
+                return -2;
+            else if (is_Players_fork == false && e_points.Count == 1)
+                return 0;
+            else
+                throw new Exception("Error in the method rule_3_5_check_forks.");
+        }
         private void computers_move_hard(out int _row, out int _col)
         {
             _row = -1;
@@ -1402,9 +1472,6 @@ namespace WinFormsApp2
             int random = -1;
             bool temp_bool = false;
             Point temp_point, temp_point2;
-
-            Empty_point_list.Clear();
-            Empty_point_list = fields_occupied_by(2); // get a list of empty fields
 
             // 1st move. 
             if (count_empty_fields() == 9)
@@ -1460,6 +1527,9 @@ namespace WinFormsApp2
                 else if ((m[0, 1] == 0 || m[1, 0] == 0 || m[1, 2] == 0 || m[2, 1] == 0) &&
                    (m[0, 0] == 2 && m[0, 2] == 2 && m[1, 1] == 2 && m[2, 0] == 2 && m[2, 2] == 2)) // Case c); Player = 0, occupied by Computer = 1, empty = 2
                 {
+            Empty_point_list.Clear();
+            Empty_point_list = fields_occupied_by(2); // get a list of empty fields
+
                     random = rnd.Next(4); // random == 0 => c.1; random == 1 || 2 => c.2; random == 3 => c.3
                     if (random == 0) // the center
                     {
@@ -1771,10 +1841,7 @@ namespace WinFormsApp2
             //    3.6 General rule: the Computer should occupy lines already occupied by the Player so that they are not exclusively occupied by the Player.
             else if (count_empty_fields() <= 5)
             {
-                Computer_point_list.Clear();
-                Computer_point_list = fields_occupied_by(1); // get List of fields occupied by Computer (1)
-                Player_point_list.Clear();
-                Player_point_list = fields_occupied_by(0); // get List of fields occupied by Player (0)
+               
 
                 // 3.1 checking all possible point pairs in the Computer_point_list, if any two of them are on the same row, col or diagonal and,
                 // if yes, then if the third point on that line is empty, save its coordinates to p
@@ -1827,7 +1894,7 @@ namespace WinFormsApp2
                                 return;
                             else
                             {
-
+                                
                             }
                         }
                     }
