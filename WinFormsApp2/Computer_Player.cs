@@ -51,7 +51,7 @@ namespace WinFormsApp2
         private IModel m; // interface reference to the model object
         private GameEventArgs ep; // event parameter
         internal event EventHandler<GameEventArgs> move_done; // event delegate
-        private List<Point> Computer_point_list, Player_point_list;
+        private List<Point> Computer_point_list, Player_point_list, Empty_point_list;
 
         public Computer_Player(IModel model)
         {
@@ -59,6 +59,7 @@ namespace WinFormsApp2
             ep = new GameEventArgs();
             Computer_point_list = new List<Point>();
             Player_point_list = new List<Point>();
+            Empty_point_list = new List<Point>();
         }
 
         public void computers_move() // calls Computer's move subroutine according to the game difficulty level
@@ -843,7 +844,7 @@ namespace WinFormsApp2
                     if (ll3 == null)
                         throw new ApplicationException("Incorrect result of the line_list method applied to point_list[2]");
                 }
-                // idetification of the sign of the competitor (Player_or_Computer)
+                // identification of the sign of the competitor (Player_or_Computer)
                 int Player_or_Computer = -1;
                 if (m[point_list[0].Row, point_list[0].Col] == 0) // 0 - Player
                     Player_or_Computer = 1; // 1 - Computer
@@ -1372,7 +1373,7 @@ namespace WinFormsApp2
                 }
             }
         }
-
+        
         private void computers_move_hard(out int _row, out int _col)
         {
             _row = -1;
@@ -1381,6 +1382,9 @@ namespace WinFormsApp2
             int random = -1;
             bool temp_bool = false;
             Point temp_point, temp_point2;
+
+            Empty_point_list.Clear();
+            Empty_point_list = fields_occupied_by(2); // get a list of empty fields
 
             // 1st move. 
             if (count_empty_fields() == 9)
@@ -1767,7 +1771,7 @@ namespace WinFormsApp2
                 {
                     // 3.2 checking all possible point pairs in the Player_point_list, if any two of them are on the same row, col or diagonal and,
                     // if yes, then if the third point on that line is empty, save its coordinates to p
-                    // otherwise retur (-1, -1)
+                    // otherwise return (-1, -1)
                     p = first_empty_field_on_any_line_between_any_fields_in_list(Player_point_list);
                     if (p.Row != -1 && p.Col != -1)
                     {
